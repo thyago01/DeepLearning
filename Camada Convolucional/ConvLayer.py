@@ -23,15 +23,15 @@ def Extensao_zero(image, kernel):
     a área onde será feita a operação. 
     """
 def Convolucao(image, k, stride, padding):
-    k = np.flipud(np.fliplr(k))
+    #k = np.flipud(np.fliplr(k))
     x_row, x_col = image.shape[0], image.shape[1]
     k_row, k_col = k.shape[0], k.shape[1]
     out_row, out_col = (x_row - k_row)//stride + 1, (x_col - k_col)//stride + 1
     out = np.int16(np.zeros((out_row, out_col)))
-    for x in range(k_row//2, out_row,stride):
-        for y in range(k_col//2, out_col,stride):
+    for x in range(k_row-1, out_row,stride):
+        for y in range(k_col-1, out_col,stride):
             sub = (image[x : x + k_row, y : y + k_col])
-            out[x//stride - k_row//2,y//stride - k_col//2] = np.sum(sub * k)
+            out[x - k_row,y - k_col] = np.sum(sub * k)
             
     return out
 
@@ -73,8 +73,8 @@ def Camada_Convolucional(image,C,act_func, filters, stride, padding):
     filter_size = int(math.sqrt(filters.shape[1] - 1))
     h_filter = filter_size
     w_filter = filter_size
-    h_out = int((h_x - h_filter + 2 * padding) / stride) + 1
-    w_out = int((w_x - w_filter + 2 * padding) / stride) + 1
+    h_out = int((h_x - h_filter + 2 * padding) // stride) + 1
+    w_out = int((w_x - w_filter + 2 * padding) // stride) + 1
     fmap = np.zeros((h_out, w_out, C))
     filtro = np.zeros((h_filter, w_filter, image.shape[2]))
     linha = 0
@@ -98,7 +98,7 @@ def Camada_Convolucional(image,C,act_func, filters, stride, padding):
     Exibição do mapa de características
     """
 
-img = io.imread('ImagensDeTeste/IMG_0103.png')
+img = io.imread('ImagensDeTeste/CNN1.png')
 convFilters = np.loadtxt('filtros.csv', delimiter=',', dtype=float, skiprows=1)
 img = color.gray2rgb(img)
 filter_size = int(math.sqrt(convFilters.shape[1] - 1))
